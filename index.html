@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asistente Virtual</title>
+  <title>Asistente Virtual Inteligente</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -119,13 +119,7 @@
   <div id="chatbot-header">Asistente Virtual 🤖</div>
   <div id="chat-area" id="chat"></div>
 
-  <div class="prompt-buttons" id="prompts">
-    <button class="prompt-button">🔧 Solicitar mantenimiento</button>
-    <button class="prompt-button">🛒 Ver componentes en venta</button>
-    <button class="prompt-button">💸 Preguntar precios</button>
-    <button class="prompt-button">📞 Contactar a un asesor</button>
-    <button class="prompt-button">❓ Otras preguntas</button>
-  </div>
+  <div class="prompt-buttons" id="prompts"></div>
 
   <div id="input-area">
     <input type="text" id="user-input" placeholder="Escribe tu mensaje aquí...">
@@ -137,12 +131,21 @@
   const chatArea = document.getElementById('chat-area');
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-button');
-  const prompts = document.querySelectorAll('.prompt-button');
+  const promptsDiv = document.getElementById('prompts');
+
+  const defaultPrompts = [
+    "🔧 Solicitar mantenimiento",
+    "🛒 Ver componentes en venta",
+    "💸 Preguntar precios",
+    "📞 Contactar a un asesor",
+    "❓ Otras preguntas"
+  ];
 
   // Mensaje automático de bienvenida
   window.onload = () => {
     setTimeout(() => {
       appendMessage("¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?", "bot");
+      showPromptOptions(defaultPrompts);
     }, 500);
   };
 
@@ -154,47 +157,78 @@
     chatArea.scrollTop = chatArea.scrollHeight;
   }
 
-  // Función para procesar la entrada del usuario y generar respuestas inteligentes
-  function getBotResponse(input) {
-    const text = input.toLowerCase();
-    const keywords = {
-      mantenimiento: ['mantenimiento', 'reparación', 'arreglo', 'revisión', 'servicio'],
-      componentes: ['componentes', 'venta', 'piezas', 'partes', 'accesorios'],
-      precios: ['precio', 'coste', 'cuánto', 'cuál es el precio'],
-      contacto: ['contacto', 'asesor', 'ayuda', 'humano', 'persona'],
-      otros: ['otros', 'más', 'pregunta', 'información', 'ayuda']
-    };
-
-    // Verificar si alguna palabra clave coincide con la entrada
-    if (keywords.mantenimiento.some(word => text.includes(word))) {
-      return "Claro, ofrecemos mantenimiento para computadoras, laptops y sistemas de climatización. ¿Qué equipo necesitas revisar?";
-    }
-    if (keywords.componentes.some(word => text.includes(word))) {
-      return "Vendemos discos duros, memorias RAM, fuentes de poder, ventiladores y más. ¿Te interesa algún componente específico?";
-    }
-    if (keywords.precios.some(word => text.includes(word))) {
-      return "Los precios varían según el producto. ¿Qué componente o servicio te interesa?";
-    }
-    if (keywords.contacto.some(word => text.includes(word))) {
-      return "Puedes contactar a un asesor llamando o escribiendo al WhatsApp: +123456789. También puedo ayudarte por aquí.";
-    }
-    if (keywords.otros.some(word => text.includes(word))) {
-      return "Estoy aquí para ayudarte. ¿Tienes alguna otra pregunta sobre nuestros servicios, pagos, o garantías?";
-    }
-
-    return "No entendí bien tu pregunta 😅. ¿Puedes reformularla o elegir una opción de las sugerencias?";
+  function showPromptOptions(options) {
+    promptsDiv.innerHTML = ''; // Limpiar opciones anteriores
+    options.forEach(option => {
+      const button = document.createElement('button');
+      button.classList.add('prompt-button');
+      button.textContent = option;
+      button.addEventListener('click', () => {
+        handleUserInput(option);
+      });
+      promptsDiv.appendChild(button);
+    });
   }
 
-  function sendUserMessage(message) {
-    appendMessage(message, 'user');
-    const response = getBotResponse(message);
-    setTimeout(() => appendMessage(response, 'bot'), 600);
+  function handleUserInput(input) {
+    appendMessage(input, 'user');
+    const response = generateResponse(input);
+    setTimeout(() => {
+      appendMessage(response.text, 'bot');
+      showPromptOptions(response.nextSteps);
+    }, 600);
+  }
+
+  function generateResponse(input) {
+    const text = input.toLowerCase();
+    
+    const responses = {
+      mantenimiento: {
+        text: "¡Claro! Ofrecemos mantenimiento para computadoras, laptops, y sistemas de climatización. ¿Qué dispositivo necesitas reparar?",
+        nextSteps: ["🔧 Solicitar reparación de computadora", "🔧 Solicitar reparación de impresora", "❓ Otras preguntas"]
+      },
+      componentes: {
+        text: "Vendemos componentes como discos duros, SSDs, memorias RAM y más. ¿Qué componente te interesa?",
+        nextSteps: ["🛒 Discos duros", "🛒 Memorias RAM", "🛒 Fuentes de poder", "❓ Otras preguntas"]
+      },
+      precios: {
+        text: "Los precios dependen del servicio o componente. ¿Sobre qué servicio o producto te gustaría saber más?",
+        nextSteps: ["💸 Preguntar precio de discos duros", "💸 Preguntar precio de mantenimiento", "❓ Otras preguntas"]
+      },
+      contacto: {
+        text: "Para contactar a un asesor, puedes llamarnos o enviarnos un mensaje al WhatsApp: +123456789. ¿Te gustaría más información?",
+        nextSteps: ["📞 Contactar ahora", "❓ Otras preguntas"]
+      },
+      otros: {
+        text: "¿En qué más puedo ayudarte? Puedo ofrecerte información sobre pagos, garantías o nuestros horarios.",
+        nextSteps: ["❓ Información sobre pagos", "❓ Información sobre garantías", "❓ Otros servicios"]
+      },
+      default: {
+        text: "No estoy seguro de cómo responder a eso. ¿Puedes elegir una de las opciones anteriores?",
+        nextSteps: defaultPrompts
+      }
+    };
+
+    // Determinar qué respuesta enviar según el input
+    if (text.includes("mantenimiento") || text.includes("reparación")) {
+      return responses.mantenimiento;
+    } else if (text.includes("componentes") || text.includes("venta")) {
+      return responses.componentes;
+    } else if (text.includes("precio") || text.includes("coste")) {
+      return responses.precios;
+    } else if (text.includes("asesor") || text.includes("contactar")) {
+      return responses.contacto;
+    } else if (text.includes("otros") || text.includes("ayuda")) {
+      return responses.otros;
+    } else {
+      return responses.default;
+    }
   }
 
   sendButton.addEventListener('click', () => {
     const input = userInput.value.trim();
     if (!input) return;
-    sendUserMessage(input);
+    handleUserInput(input);
     userInput.value = '';
   });
 
@@ -202,13 +236,8 @@
     if (e.key === 'Enter') sendButton.click();
   });
 
-  prompts.forEach(button => {
-    button.addEventListener('click', () => {
-      const text = button.textContent;
-      sendUserMessage(text);
-    });
-  });
 </script>
 
 </body>
 </html>
+
