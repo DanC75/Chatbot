@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asistente de Soporte</title>
+  <title>Asistente Virtual</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -139,6 +139,13 @@
   const sendButton = document.getElementById('send-button');
   const prompts = document.querySelectorAll('.prompt-button');
 
+  // Mensaje automático de bienvenida
+  window.onload = () => {
+    setTimeout(() => {
+      appendMessage("¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?", "bot");
+    }, 500);
+  };
+
   function appendMessage(text, sender) {
     const msg = document.createElement('div');
     msg.classList.add('message', sender);
@@ -147,22 +154,35 @@
     chatArea.scrollTop = chatArea.scrollHeight;
   }
 
+  // Función para procesar la entrada del usuario y generar respuestas inteligentes
   function getBotResponse(input) {
     const text = input.toLowerCase();
+    const keywords = {
+      mantenimiento: ['mantenimiento', 'reparación', 'arreglo', 'revisión', 'servicio'],
+      componentes: ['componentes', 'venta', 'piezas', 'partes', 'accesorios'],
+      precios: ['precio', 'coste', 'cuánto', 'cuál es el precio'],
+      contacto: ['contacto', 'asesor', 'ayuda', 'humano', 'persona'],
+      otros: ['otros', 'más', 'pregunta', 'información', 'ayuda']
+    };
 
-    if (text.includes("mantenimiento")) {
-      return "Claro, ofrecemos mantenimiento para computadoras, laptops y climatización. ¿Qué equipo necesitas revisar?";
-    } else if (text.includes("venta") || text.includes("componentes")) {
-      return "Vendemos discos duros, memorias RAM, fuentes de poder, ventiladores y más. ¿Te interesa algo específico?";
-    } else if (text.includes("precio")) {
-      return "¿Sobre qué producto o servicio quieres conocer el precio?";
-    } else if (text.includes("asesor") || text.includes("contactar") || text.includes("humano")) {
-      return "Puedes hablar con un asesor llamando o escribiendo al WhatsApp: +123456789.";
-    } else if (text.includes("otros") || text.includes("pregunta")) {
-      return "Estoy aquí para ayudarte. Puedes preguntarme sobre nuestros horarios, formas de pago, garantías y más.";
-    } else {
-      return "No entendí muy bien 😅. ¿Puedes reformularlo o elegir una opción de las sugerencias?";
+    // Verificar si alguna palabra clave coincide con la entrada
+    if (keywords.mantenimiento.some(word => text.includes(word))) {
+      return "Claro, ofrecemos mantenimiento para computadoras, laptops y sistemas de climatización. ¿Qué equipo necesitas revisar?";
     }
+    if (keywords.componentes.some(word => text.includes(word))) {
+      return "Vendemos discos duros, memorias RAM, fuentes de poder, ventiladores y más. ¿Te interesa algún componente específico?";
+    }
+    if (keywords.precios.some(word => text.includes(word))) {
+      return "Los precios varían según el producto. ¿Qué componente o servicio te interesa?";
+    }
+    if (keywords.contacto.some(word => text.includes(word))) {
+      return "Puedes contactar a un asesor llamando o escribiendo al WhatsApp: +123456789. También puedo ayudarte por aquí.";
+    }
+    if (keywords.otros.some(word => text.includes(word))) {
+      return "Estoy aquí para ayudarte. ¿Tienes alguna otra pregunta sobre nuestros servicios, pagos, o garantías?";
+    }
+
+    return "No entendí bien tu pregunta 😅. ¿Puedes reformularla o elegir una opción de las sugerencias?";
   }
 
   function sendUserMessage(message) {
@@ -188,13 +208,6 @@
       sendUserMessage(text);
     });
   });
-
-  // Mensaje automático de bienvenida
-  window.onload = () => {
-    setTimeout(() => {
-      appendMessage("¡Hola! 👋 Soy Delta tu asistente virtual. ¿En qué puedo ayudarte hoy?", "bot");
-    }, 500);
-  };
 </script>
 
 </body>
