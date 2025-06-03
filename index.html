@@ -3,36 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chatbot Amigable</title>
+  <title>Asistente de Soporte</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
-      background: #f1f1f1;
+      background: #eef1f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     #chatbot-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 350px;
-      height: 500px;
+      width: 400px;
+      height: 600px;
       background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      z-index: 999;
     }
 
     #chatbot-header {
       background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
       color: white;
-      padding: 16px;
+      padding: 18px;
+      font-size: 18px;
       font-weight: bold;
-      font-size: 16px;
       text-align: center;
     }
 
@@ -40,27 +40,27 @@
       flex: 1;
       padding: 16px;
       overflow-y: auto;
-      background: #f9f9f9;
+      background: #f7f9fb;
     }
 
     .message {
       margin: 10px 0;
-      padding: 10px 14px;
+      padding: 12px 16px;
       border-radius: 20px;
       max-width: 75%;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .bot {
-      background: #e0f7fa;
+      background: #e1f5fe;
+      color: #0277bd;
       align-self: flex-start;
-      color: #00796b;
     }
 
     .user {
       background: #d1c4e9;
-      align-self: flex-end;
       color: #4a148c;
+      align-self: flex-end;
     }
 
     #input-area {
@@ -74,7 +74,7 @@
       border: none;
       padding: 14px;
       font-size: 14px;
-      border-radius: 0 0 0 16px;
+      border-radius: 0;
     }
 
     #send-button {
@@ -84,11 +84,32 @@
       padding: 0 20px;
       cursor: pointer;
       font-size: 16px;
-      border-radius: 0 0 16px 0;
     }
 
     #send-button:hover {
       background: #00c6ff;
+    }
+
+    .prompt-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .prompt-button {
+      padding: 10px 14px;
+      border-radius: 16px;
+      background-color: #e0f7fa;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: #00796b;
+      transition: background-color 0.3s;
+    }
+
+    .prompt-button:hover {
+      background-color: #b2ebf2;
     }
   </style>
 </head>
@@ -96,7 +117,16 @@
 
 <div id="chatbot-container">
   <div id="chatbot-header">Asistente Virtual 🤖</div>
-  <div id="chat-area"></div>
+  <div id="chat-area" id="chat"></div>
+
+  <div class="prompt-buttons" id="prompts">
+    <button class="prompt-button">🔧 Solicitar mantenimiento</button>
+    <button class="prompt-button">🛒 Ver componentes en venta</button>
+    <button class="prompt-button">💸 Preguntar precios</button>
+    <button class="prompt-button">📞 Contactar a un asesor</button>
+    <button class="prompt-button">❓ Otras preguntas</button>
+  </div>
+
   <div id="input-area">
     <input type="text" id="user-input" placeholder="Escribe tu mensaje aquí...">
     <button id="send-button">➤</button>
@@ -107,13 +137,7 @@
   const chatArea = document.getElementById('chat-area');
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-button');
-
-  // Mostrar mensaje de bienvenida automático
-  window.onload = () => {
-    setTimeout(() => {
-      appendMessage("¡Hola! 👋  Soy Delta tu asistente virtual. ¿En qué puedo ayudarte hoy? 😊", "bot");
-    }, 500);
-  };
+  const prompts = document.querySelectorAll('.prompt-button');
 
   function appendMessage(text, sender) {
     const msg = document.createElement('div');
@@ -126,37 +150,52 @@
   function getBotResponse(input) {
     const text = input.toLowerCase();
 
-    if (text.includes("hola") || text.includes("buenas")) {
-      return "¡Hola! ¿En qué puedo ayudarte hoy?";
-    } else if (text.includes("mantenimiento")) {
-      return "Ofrecemos mantenimiento para computadoras, laptops, impresoras y sistemas de climatización. ¿Qué necesitas revisar?";
-    } else if (text.includes("venta") || text.includes("componente")) {
-      return "Contamos con discos duros, SSDs, memorias RAM, fuentes, ventiladores y más. ¿Qué estás buscando?";
+    if (text.includes("mantenimiento")) {
+      return "Claro, ofrecemos mantenimiento para computadoras, laptops y climatización. ¿Qué equipo necesitas revisar?";
+    } else if (text.includes("venta") || text.includes("componentes")) {
+      return "Vendemos discos duros, memorias RAM, fuentes de poder, ventiladores y más. ¿Te interesa algo específico?";
     } else if (text.includes("precio")) {
-      return "Para darte un precio exacto, dime qué componente o servicio te interesa.";
-    } else if (text.includes("gracias")) {
-      return "¡Con mucho gusto! 😊 Si tienes más preguntas, aquí estaré.";
-    } else if (text.includes("humano") || text.includes("asesor")) {
-      return "En breve te contactará un asesor humano. También puedes escribirnos al WhatsApp +123456789.";
+      return "¿Sobre qué producto o servicio quieres conocer el precio?";
+    } else if (text.includes("asesor") || text.includes("contactar") || text.includes("humano")) {
+      return "Puedes hablar con un asesor llamando o escribiendo al WhatsApp: +123456789.";
+    } else if (text.includes("otros") || text.includes("pregunta")) {
+      return "Estoy aquí para ayudarte. Puedes preguntarme sobre nuestros horarios, formas de pago, garantías y más.";
     } else {
-      return "No entendí muy bien 😅. ¿Podrías indicarme si necesitas mantenimiento o estás buscando un componente?";
+      return "No entendí muy bien 😅. ¿Puedes reformularlo o elegir una opción de las sugerencias?";
     }
+  }
+
+  function sendUserMessage(message) {
+    appendMessage(message, 'user');
+    const response = getBotResponse(message);
+    setTimeout(() => appendMessage(response, 'bot'), 600);
   }
 
   sendButton.addEventListener('click', () => {
     const input = userInput.value.trim();
     if (!input) return;
-    appendMessage(input, 'user');
-    const response = getBotResponse(input);
-    setTimeout(() => appendMessage(response, 'bot'), 600);
+    sendUserMessage(input);
     userInput.value = '';
   });
 
   userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendButton.click();
   });
+
+  prompts.forEach(button => {
+    button.addEventListener('click', () => {
+      const text = button.textContent;
+      sendUserMessage(text);
+    });
+  });
+
+  // Mensaje automático de bienvenida
+  window.onload = () => {
+    setTimeout(() => {
+      appendMessage("¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?", "bot");
+    }, 500);
+  };
 </script>
 
 </body>
 </html>
-
