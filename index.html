@@ -2,79 +2,104 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot de Soporte</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chatbot Amigable</title>
   <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f1f1f1;
+    }
+
     #chatbot-container {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 300px;
-      height: 400px;
-      background: white;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      width: 350px;
+      height: 500px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
-      font-family: Arial, sans-serif;
+      overflow: hidden;
+      z-index: 999;
     }
 
     #chatbot-header {
-      background-color: #0d6efd;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
       color: white;
-      padding: 10px;
-      border-radius: 10px 10px 0 0;
+      padding: 16px;
+      font-weight: bold;
+      font-size: 16px;
       text-align: center;
     }
 
     #chat-area {
       flex: 1;
-      padding: 10px;
+      padding: 16px;
       overflow-y: auto;
+      background: #f9f9f9;
     }
 
     .message {
-      margin: 5px 0;
+      margin: 10px 0;
+      padding: 10px 14px;
+      border-radius: 20px;
+      max-width: 75%;
+      line-height: 1.4;
     }
 
     .bot {
-      color: #0d6efd;
+      background: #e0f7fa;
+      align-self: flex-start;
+      color: #00796b;
     }
 
     .user {
-      text-align: right;
-      color: #333;
+      background: #d1c4e9;
+      align-self: flex-end;
+      color: #4a148c;
     }
 
     #input-area {
       display: flex;
       border-top: 1px solid #ccc;
+      background: #fff;
     }
 
     #user-input {
       flex: 1;
       border: none;
-      padding: 10px;
+      padding: 14px;
+      font-size: 14px;
+      border-radius: 0 0 0 16px;
     }
 
     #send-button {
-      background: #0d6efd;
+      background: #4facfe;
       color: white;
       border: none;
-      padding: 10px 15px;
+      padding: 0 20px;
       cursor: pointer;
+      font-size: 16px;
+      border-radius: 0 0 16px 0;
+    }
+
+    #send-button:hover {
+      background: #00c6ff;
     }
   </style>
 </head>
 <body>
 
 <div id="chatbot-container">
-  <div id="chatbot-header">Asistente de Soporte</div>
+  <div id="chatbot-header">Asistente Virtual 🤖</div>
   <div id="chat-area"></div>
   <div id="input-area">
-    <input type="text" id="user-input" placeholder="Escribe tu mensaje..." />
-    <button id="send-button">Enviar</button>
+    <input type="text" id="user-input" placeholder="Escribe tu mensaje aquí...">
+    <button id="send-button">➤</button>
   </div>
 </div>
 
@@ -82,6 +107,13 @@
   const chatArea = document.getElementById('chat-area');
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-button');
+
+  // Mostrar mensaje de bienvenida automático
+  window.onload = () => {
+    setTimeout(() => {
+      appendMessage("¡Hola! 👋 Delta Soy tu asistente virtual. ¿En qué puedo ayudarte hoy? 😊", "bot");
+    }, 500);
+  };
 
   function appendMessage(text, sender) {
     const msg = document.createElement('div');
@@ -95,28 +127,28 @@
     const text = input.toLowerCase();
 
     if (text.includes("hola") || text.includes("buenas")) {
-      return "¡Hola! 👋 ¿En qué puedo ayudarte hoy? ¿Buscas mantenimiento o estás interesado en comprar componentes?";
+      return "¡Hola! ¿En qué puedo ayudarte hoy?";
     } else if (text.includes("mantenimiento")) {
-      return "Ofrecemos servicios de mantenimiento para computadoras, laptops y sistemas de climatización. ¿Qué equipo necesitas revisar?";
-    } else if (text.includes("componentes") || text.includes("venta")) {
-      return "Vendemos partes como discos duros, memorias RAM, fuentes de poder, y más. ¿Qué componente necesitas?";
-    } else if (text.includes("precio") || text.includes("cuánto")) {
-      return "Para darte un precio exacto, dime qué producto estás buscando.";
+      return "Ofrecemos mantenimiento para computadoras, laptops, impresoras y sistemas de climatización. ¿Qué necesitas revisar?";
+    } else if (text.includes("venta") || text.includes("componente")) {
+      return "Contamos con discos duros, SSDs, memorias RAM, fuentes, ventiladores y más. ¿Qué estás buscando?";
+    } else if (text.includes("precio")) {
+      return "Para darte un precio exacto, dime qué componente o servicio te interesa.";
     } else if (text.includes("gracias")) {
-      return "¡Con gusto! Si necesitas algo más, aquí estaré 😊.";
-    } else if (text.includes("humano") || text.includes("persona")) {
-      return "Voy a pasarte con un asesor humano. Por favor, espera un momento o comunícate al WhatsApp +123456789.";
+      return "¡Con mucho gusto! 😊 Si tienes más preguntas, aquí estaré.";
+    } else if (text.includes("humano") || text.includes("asesor")) {
+      return "En breve te contactará un asesor humano. También puedes escribirnos al WhatsApp +123456789.";
     } else {
-      return "Lo siento, no entendí eso. ¿Podrías reformularlo o decirme si necesitas mantenimiento o una cotización?";
+      return "No entendí muy bien 😅. ¿Podrías indicarme si necesitas mantenimiento o estás buscando un componente?";
     }
   }
 
   sendButton.addEventListener('click', () => {
-    const input = userInput.value;
+    const input = userInput.value.trim();
     if (!input) return;
     appendMessage(input, 'user');
     const response = getBotResponse(input);
-    setTimeout(() => appendMessage(response, 'bot'), 500);
+    setTimeout(() => appendMessage(response, 'bot'), 600);
     userInput.value = '';
   });
 
