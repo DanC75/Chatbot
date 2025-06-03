@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot de Soporte</title>
+  <style>
+    #chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      height: 400px;
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+    }
+
+    #chatbot-header {
+      background-color: #0d6efd;
+      color: white;
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+    }
+
+    #chat-area {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 5px 0;
+    }
+
+    .bot {
+      color: #0d6efd;
+    }
+
+    .user {
+      text-align: right;
+      color: #333;
+    }
+
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #user-input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+    }
+
+    #send-button {
+      background: #0d6efd;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chatbot-container">
+  <div id="chatbot-header">Asistente de Soporte</div>
+  <div id="chat-area"></div>
+  <div id="input-area">
+    <input type="text" id="user-input" placeholder="Escribe tu mensaje..." />
+    <button id="send-button">Enviar</button>
+  </div>
+</div>
+
+<script>
+  const chatArea = document.getElementById('chat-area');
+  const userInput = document.getElementById('user-input');
+  const sendButton = document.getElementById('send-button');
+
+  function appendMessage(text, sender) {
+    const msg = document.createElement('div');
+    msg.classList.add('message', sender);
+    msg.textContent = text;
+    chatArea.appendChild(msg);
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function getBotResponse(input) {
+    const text = input.toLowerCase();
+
+    if (text.includes("hola") || text.includes("buenas")) {
+      return "¡Hola! 👋 ¿En qué puedo ayudarte hoy? ¿Buscas mantenimiento o estás interesado en comprar componentes?";
+    } else if (text.includes("mantenimiento")) {
+      return "Ofrecemos servicios de mantenimiento para computadoras, laptops y sistemas de climatización. ¿Qué equipo necesitas revisar?";
+    } else if (text.includes("componentes") || text.includes("venta")) {
+      return "Vendemos partes como discos duros, memorias RAM, fuentes de poder, y más. ¿Qué componente necesitas?";
+    } else if (text.includes("precio") || text.includes("cuánto")) {
+      return "Para darte un precio exacto, dime qué producto estás buscando.";
+    } else if (text.includes("gracias")) {
+      return "¡Con gusto! Si necesitas algo más, aquí estaré 😊.";
+    } else if (text.includes("humano") || text.includes("persona")) {
+      return "Voy a pasarte con un asesor humano. Por favor, espera un momento o comunícate al WhatsApp +123456789.";
+    } else {
+      return "Lo siento, no entendí eso. ¿Podrías reformularlo o decirme si necesitas mantenimiento o una cotización?";
+    }
+  }
+
+  sendButton.addEventListener('click', () => {
+    const input = userInput.value;
+    if (!input) return;
+    appendMessage(input, 'user');
+    const response = getBotResponse(input);
+    setTimeout(() => appendMessage(response, 'bot'), 500);
+    userInput.value = '';
+  });
+
+  userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendButton.click();
+  });
+</script>
+
+</body>
+</html>
