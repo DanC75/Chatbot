@@ -41,6 +41,8 @@
       padding: 16px;
       overflow-y: auto;
       background: #f7f9fb;
+      display: flex;
+      flex-direction: column;
     }
 
     .message {
@@ -89,37 +91,13 @@
     #send-button:hover {
       background: #00c6ff;
     }
-
-    .prompt-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .prompt-button {
-      padding: 10px 14px;
-      border-radius: 16px;
-      background-color: #e0f7fa;
-      border: none;
-      cursor: pointer;
-      font-size: 13px;
-      color: #00796b;
-      transition: background-color 0.3s;
-    }
-
-    .prompt-button:hover {
-      background-color: #b2ebf2;
-    }
   </style>
 </head>
 <body>
 
 <div id="chatbot-container">
-  <div id="chatbot-header">Asistente Virtual 🤖</div>
-  <div id="chat-area" id="chat"></div>
-
-  <div class="prompt-buttons" id="prompts"></div>
+  <div id="chatbot-header">Asistente Virtual IA 🤖</div>
+  <div id="chat-area"></div>
 
   <div id="input-area">
     <input type="text" id="user-input" placeholder="Escribe tu mensaje aquí...">
@@ -131,21 +109,10 @@
   const chatArea = document.getElementById('chat-area');
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-button');
-  const promptsDiv = document.getElementById('prompts');
 
-  const defaultPrompts = [
-    "🔧 Solicitar mantenimiento",
-    "🛒 Ver componentes en venta",
-    "💸 Preguntar precios",
-    "📞 Contactar a un asesor",
-    "❓ Otras preguntas"
-  ];
-
-  // Mensaje automático de bienvenida
   window.onload = () => {
     setTimeout(() => {
-      appendMessage("¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?", "bot");
-      showPromptOptions(defaultPrompts);
+      appendMessage("¡Hola! 👋 Soy tu asistente con inteligencia artificial. ¿En qué puedo ayudarte hoy?", "bot");
     }, 500);
   };
 
@@ -157,72 +124,26 @@
     chatArea.scrollTop = chatArea.scrollHeight;
   }
 
-  function showPromptOptions(options) {
-    promptsDiv.innerHTML = ''; // Limpiar opciones anteriores
-    options.forEach(option => {
-      const button = document.createElement('button');
-      button.classList.add('prompt-button');
-      button.textContent = option;
-      button.addEventListener('click', () => {
-        handleUserInput(option);
+  async function generateAIResponse(input) {
+    try {
+      const res = await fetch('http://localhost:3000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input })
       });
-      promptsDiv.appendChild(button);
-    });
+
+      const data = await res.json();
+      return data.reply;
+    } catch (error) {
+      return "⚠️ Hubo un error al comunicarme con la inteligencia artificial.";
+    }
   }
 
   function handleUserInput(input) {
     appendMessage(input, 'user');
-    const response = generateResponse(input);
-    setTimeout(() => {
-      appendMessage(response.text, 'bot');
-      showPromptOptions(response.nextSteps);
-    }, 600);
-  }
-
-  function generateResponse(input) {
-    const text = input.toLowerCase();
-    
-    const responses = {
-      mantenimiento: {
-        text: "¡Claro! Ofrecemos mantenimiento para computadoras, laptops, y sistemas de climatización. ¿Qué dispositivo necesitas reparar?",
-        nextSteps: ["🔧 Solicitar reparación de computadora", "🔧 Solicitar reparación de impresora", "❓ Otras preguntas"]
-      },
-      componentes: {
-        text: "Vendemos componentes como discos duros, SSDs, memorias RAM y más. ¿Qué componente te interesa?",
-        nextSteps: ["🛒 Discos duros", "🛒 Memorias RAM", "🛒 Fuentes de poder", "❓ Otras preguntas"]
-      },
-      precios: {
-        text: "Los precios dependen del servicio o componente. ¿Sobre qué servicio o producto te gustaría saber más?",
-        nextSteps: ["💸 Preguntar precio de discos duros", "💸 Preguntar precio de mantenimiento", "❓ Otras preguntas"]
-      },
-      contacto: {
-        text: "Para contactar a un asesor, puedes llamarnos o enviarnos un mensaje al WhatsApp: +123456789. ¿Te gustaría más información?",
-        nextSteps: ["📞 Contactar ahora", "❓ Otras preguntas"]
-      },
-      otros: {
-        text: "¿En qué más puedo ayudarte? Puedo ofrecerte información sobre pagos, garantías o nuestros horarios.",
-        nextSteps: ["❓ Información sobre pagos", "❓ Información sobre garantías", "❓ Otros servicios"]
-      },
-      default: {
-        text: "No estoy seguro de cómo responder a eso. ¿Puedes elegir una de las opciones anteriores?",
-        nextSteps: defaultPrompts
-      }
-    };
-
-    // Determinar qué respuesta enviar según el input
-    if (text.includes("mantenimiento") || text.includes("reparación")) {
-      return responses.mantenimiento;
-    } else if (text.includes("componentes") || text.includes("venta")) {
-      return responses.componentes;
-    } else if (text.includes("precio") || text.includes("coste")) {
-      return responses.precios;
-    } else if (text.includes("asesor") || text.includes("contactar")) {
-      return responses.contacto;
-    } else if (text.includes("otros") || text.includes("ayuda")) {
-      return responses.otros;
-    } else {
-      return responses.default;
-    }
+    generateAIResponse(input).then(response => {
+      appendMessage(response, 'bot');
+    });
   }
 
   sendButton.addEventListener('click', () => {
@@ -235,7 +156,6 @@
   userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendButton.click();
   });
-
 </script>
 
 </body>
